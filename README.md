@@ -18,7 +18,7 @@
 [![npm version](https://img.shields.io/npm/v/x-files.js.svg)](https://www.npmjs.com/package/x-files.js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[Installation](#installation) • [Quick Start](#quick-start) • [API](#api) • [Security](#security) • [Examples](#examples)
+[Installation](#installation) • [Quick Start](#quick-start) • [UI Components](#ui-components) • [API](#api) • [Security](#security) • [Examples](#examples)
 
 </div>
 
@@ -33,6 +33,7 @@ WebSocket-based file browser for Node.js. Browse, read, write, and manage remote
 - **Lightweight** - ~10KB client bundle, minimal dependencies
 - **TypeScript** - Full type definitions included
 - **Universal** - Works in browsers and Node.js
+- **UI Components** - Drop-in Web Components that work with any framework
 
 ## Installation
 
@@ -86,6 +87,130 @@ const client = new XFilesClient({ url: 'ws://localhost:8080' });
 await client.connect();
 
 const files = await client.listDirectory('/home/user');
+```
+
+## UI Components
+
+x-files.js includes ready-to-use Web Components built with [Lit](https://lit.dev/). They work with any framework (React, Vue, Angular, Svelte, vanilla JS).
+
+### Quick Usage
+
+```html
+<script type="module">
+  import 'x-files.js/ui/browser';
+</script>
+
+<x-files-browser
+  url="ws://localhost:8080"
+  path="/home/user/projects"
+></x-files-browser>
+```
+
+### Available Components
+
+| Component | Description |
+|-----------|-------------|
+| `<x-files-browser>` | Full file browser with navigation, toolbar, and context menu |
+| `<x-files-icon>` | File/folder icon with type detection |
+| `<x-files-breadcrumb>` | Breadcrumb path navigation |
+
+### Browser Component
+
+```html
+<x-files-browser
+  url="ws://localhost:8080/files"
+  path="/home/user"
+  show-hidden
+  readonly
+></x-files-browser>
+
+<script>
+  const browser = document.querySelector('x-files-browser');
+
+  // Listen for file selection
+  browser.addEventListener('select', (e) => {
+    console.log('Selected:', e.detail.file);
+  });
+
+  // Listen for file open (double-click)
+  browser.addEventListener('open', (e) => {
+    console.log('Opened:', e.detail.file);
+  });
+
+  // Listen for navigation
+  browser.addEventListener('navigate', (e) => {
+    console.log('Navigated to:', e.detail.path);
+  });
+</script>
+```
+
+### Theming
+
+Customize the appearance using CSS custom properties:
+
+```css
+x-files-browser {
+  /* Colors */
+  --x-files-bg: #1e1e1e;
+  --x-files-bg-hover: #2d2d2d;
+  --x-files-bg-selected: #094771;
+  --x-files-border: #3c3c3c;
+  --x-files-text: #cccccc;
+  --x-files-text-muted: #808080;
+  --x-files-accent: #0078d4;
+
+  /* Icons */
+  --x-files-icon-folder: #dcb67a;
+  --x-files-icon-file: #cccccc;
+
+  /* Sizing */
+  --x-files-font-size: 13px;
+  --x-files-row-height: 28px;
+  --x-files-icon-size: 16px;
+  --x-files-padding: 8px;
+  --x-files-radius: 4px;
+  --x-files-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+```
+
+### With React
+
+```jsx
+import 'x-files.js/ui/browser';
+
+function App() {
+  const handleSelect = (e) => {
+    console.log('Selected:', e.detail.file);
+  };
+
+  return (
+    <x-files-browser
+      url="ws://localhost:8080"
+      path="/home/user"
+      onSelect={handleSelect}
+    />
+  );
+}
+```
+
+### With Vue
+
+```vue
+<template>
+  <x-files-browser
+    url="ws://localhost:8080"
+    path="/home/user"
+    @select="onSelect"
+  />
+</template>
+
+<script setup>
+import 'x-files.js/ui/browser';
+
+const onSelect = (e) => {
+  console.log('Selected:', e.detail.file);
+};
+</script>
 ```
 
 ## API
@@ -234,6 +359,20 @@ server.listen(3000);
 ```
 
 ### File Browser UI
+
+Using the built-in Web Component:
+
+```html
+<script type="module" src="https://unpkg.com/x-files.js/dist/ui/browser-bundle.js"></script>
+
+<x-files-browser
+  url="ws://localhost:8080"
+  path="/data"
+  style="height: 400px;"
+></x-files-browser>
+```
+
+Or build your own UI with the headless client:
 
 ```html
 <div id="file-list"></div>
