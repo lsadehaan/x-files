@@ -50,12 +50,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anthropics/x-files.js"
+    "url": "git+https://github.com/lsadehaan/x-files.git"
   },
   "bugs": {
-    "url": "https://github.com/anthropics/x-files.js/issues"
+    "url": "https://github.com/lsadehaan/x-files/issues"
   },
-  "homepage": "https://github.com/anthropics/x-files.js#readme",
+  "homepage": "https://github.com/lsadehaan/x-files#readme",
   "engines": {
     "node": ">=18.0.0"
   },
