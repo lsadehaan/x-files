@@ -150,7 +150,7 @@ export class XFilesBrowser extends LitElement {
       }
 
       .context-menu-item.danger {
-        color: #f44336;
+        color: var(--xf-danger);
       }
 
       .context-menu-divider {
@@ -176,6 +176,7 @@ export class XFilesBrowser extends LitElement {
   @property({ type: String }) path = '';
   @property({ type: Boolean }) showHidden = false;
   @property({ type: Boolean }) readonly = false;
+  @property({ type: String, reflect: true }) theme: 'dark' | 'light' | 'auto' = 'dark';
 
   @state() private client: XFilesClient | null = null;
   @state() private files: FileEntry[] = [];

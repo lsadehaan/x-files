@@ -146,7 +146,20 @@ x-files.js includes ready-to-use Web Components built with [Lit](https://lit.dev
 
 ### Theming
 
-Customize the appearance using CSS custom properties:
+Use the `theme` attribute for built-in themes:
+
+```html
+<!-- Dark theme (default) -->
+<x-files-browser theme="dark" url="ws://localhost:8080"></x-files-browser>
+
+<!-- Light theme -->
+<x-files-browser theme="light" url="ws://localhost:8080"></x-files-browser>
+
+<!-- Auto - follows system preference -->
+<x-files-browser theme="auto" url="ws://localhost:8080"></x-files-browser>
+```
+
+Or customize with CSS custom properties:
 
 ```css
 x-files-browser {
@@ -158,6 +171,7 @@ x-files-browser {
   --x-files-text: #cccccc;
   --x-files-text-muted: #808080;
   --x-files-accent: #0078d4;
+  --x-files-danger: #f44336;
 
   /* Icons */
   --x-files-icon-folder: #dcb67a;
