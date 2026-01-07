@@ -1,6 +1,6 @@
 {
   "name": "x-files.js",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "WebSocket-based file browser for Node.js - the truth is in your file system",
   "type": "module",
   "main": "dist/server/index.js",
