@@ -228,7 +228,6 @@ export class XFilesBrowser extends LitElement {
 
       this.client.onConnect(() => {
         this.connected = true;
-        this.loadDirectory();
       });
 
       this.client.onDisconnect(() => {
@@ -252,6 +251,9 @@ export class XFilesBrowser extends LitElement {
           this.path = this.rootPath;
         }
       }
+
+      // Load directory after path is set
+      await this.loadDirectory();
     } catch (err) {
       this.error = err instanceof Error ? err.message : 'Connection failed';
       this.loading = false;
