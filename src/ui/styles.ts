@@ -13,7 +13,7 @@ export const sharedStyles = css`
     --xf-padding: var(--x-files-padding, 8px);
     --xf-radius: var(--x-files-radius, 4px);
 
-    /* Default: Dark theme */
+    /* Inherit theme colors from parent, with dark defaults */
     --xf-bg: var(--x-files-bg, #1e1e1e);
     --xf-bg-hover: var(--x-files-bg-hover, #2d2d2d);
     --xf-bg-selected: var(--x-files-bg-selected, #094771);
@@ -32,36 +32,6 @@ export const sharedStyles = css`
     background: var(--xf-bg);
   }
 
-  /* Light theme */
-  :host([theme="light"]) {
-    --xf-bg: var(--x-files-bg, #ffffff);
-    --xf-bg-hover: var(--x-files-bg-hover, #f3f4f6);
-    --xf-bg-selected: var(--x-files-bg-selected, #dbeafe);
-    --xf-border: var(--x-files-border, #e5e7eb);
-    --xf-text: var(--x-files-text, #1f2937);
-    --xf-text-muted: var(--x-files-text-muted, #6b7280);
-    --xf-accent: var(--x-files-accent, #2563eb);
-    --xf-icon-folder: var(--x-files-icon-folder, #f59e0b);
-    --xf-icon-file: var(--x-files-icon-file, #6b7280);
-    --xf-danger: var(--x-files-danger, #dc2626);
-  }
-
-  /* Auto theme - follows system preference */
-  @media (prefers-color-scheme: light) {
-    :host([theme="auto"]) {
-      --xf-bg: var(--x-files-bg, #ffffff);
-      --xf-bg-hover: var(--x-files-bg-hover, #f3f4f6);
-      --xf-bg-selected: var(--x-files-bg-selected, #dbeafe);
-      --xf-border: var(--x-files-border, #e5e7eb);
-      --xf-text: var(--x-files-text, #1f2937);
-      --xf-text-muted: var(--x-files-text-muted, #6b7280);
-      --xf-accent: var(--x-files-accent, #2563eb);
-      --xf-icon-folder: var(--x-files-icon-folder, #f59e0b);
-      --xf-icon-file: var(--x-files-icon-file, #6b7280);
-      --xf-danger: var(--x-files-danger, #dc2626);
-    }
-  }
-
   * {
     box-sizing: border-box;
   }
@@ -75,6 +45,39 @@ export const sharedStyles = css`
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
+  }
+`;
+
+// Theme presets - applied to the main browser component
+export const themeStyles = css`
+  /* Light theme - sets CSS custom properties that cascade to children */
+  :host([theme="light"]) {
+    --x-files-bg: #ffffff;
+    --x-files-bg-hover: #f3f4f6;
+    --x-files-bg-selected: #dbeafe;
+    --x-files-border: #e5e7eb;
+    --x-files-text: #1f2937;
+    --x-files-text-muted: #6b7280;
+    --x-files-accent: #2563eb;
+    --x-files-icon-folder: #f59e0b;
+    --x-files-icon-file: #6b7280;
+    --x-files-danger: #dc2626;
+  }
+
+  /* Auto theme - follows system preference */
+  @media (prefers-color-scheme: light) {
+    :host([theme="auto"]) {
+      --x-files-bg: #ffffff;
+      --x-files-bg-hover: #f3f4f6;
+      --x-files-bg-selected: #dbeafe;
+      --x-files-border: #e5e7eb;
+      --x-files-text: #1f2937;
+      --x-files-text-muted: #6b7280;
+      --x-files-accent: #2563eb;
+      --x-files-icon-folder: #f59e0b;
+      --x-files-icon-file: #6b7280;
+      --x-files-danger: #dc2626;
+    }
   }
 `;
 

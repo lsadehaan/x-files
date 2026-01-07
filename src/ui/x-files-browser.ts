@@ -4,7 +4,7 @@
 
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { sharedStyles, buttonStyles, inputStyles } from './styles.js';
+import { sharedStyles, buttonStyles, inputStyles, themeStyles } from './styles.js';
 import { XFilesClient } from '../client/client.js';
 import type { FileEntry, ServerConfig } from '../shared/types.js';
 import './x-files-icon.js';
@@ -14,6 +14,7 @@ import './x-files-breadcrumb.js';
 export class XFilesBrowser extends LitElement {
   static override styles = [
     sharedStyles,
+    themeStyles,
     buttonStyles,
     inputStyles,
     css`
