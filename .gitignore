@@ -24,3 +24,6 @@ coverage/
 # Temp files
 *.tmp
 *.temp
+
+# Cloud IDE
+.cloud-code/
