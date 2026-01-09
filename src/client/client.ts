@@ -403,4 +403,55 @@ export class XFilesClient {
   ): Promise<FileEntry[]> {
     return this.request<FileEntry[]>('search', { path, pattern, options });
   }
+
+  /**
+   * Upload file content to the server
+   * @param path File path to upload to
+   * @param content Content to upload (string for text, base64 string for binary)
+   * @param encoding Text encoding (default: 'utf-8')
+   * @param isBinary Whether the content is binary data (base64 encoded)
+   * @returns Object with path and size
+   */
+  async uploadFile(
+    path: string,
+    content: string,
+    encoding: string = 'utf-8',
+    isBinary: boolean = false
+  ): Promise<{ path: string; size: number }> {
+    return this.request('upload', { path, content, encoding, isBinary });
+  }
+
+  /**
+   * Upload binary file content to the server
+   * @param path File path to upload to
+   * @param buffer Binary data as Buffer or Uint8Array
+   * @returns Object with path and size
+   */
+  async uploadBinary(path: string, buffer: Buffer | Uint8Array): Promise<{ path: string; size: number }> {
+    const content = Buffer.from(buffer).toString('base64');
+    return this.uploadFile(path, content, 'utf-8', true);
+  }
+
+  /**
+   * Download file content from the server
+   * @param path File path to download
+   * @param asBinary Force download as binary (base64 encoded)
+   * @returns Object with content, size, and binary flag
+   */
+  async downloadFile(path: string, asBinary: boolean = false): Promise<{ content: string; size: number; isBinary: boolean }> {
+    return this.request('download', { path, asBinary });
+  }
+
+  /**
+   * Download binary file content from the server as Buffer
+   * @param path File path to download
+   * @returns Buffer with file content and size
+   */
+  async downloadBinary(path: string): Promise<{ buffer: Buffer; size: number }> {
+    const result = await this.downloadFile(path, true);
+    return {
+      buffer: Buffer.from(result.content, 'base64'),
+      size: result.size
+    };
+  }
 }

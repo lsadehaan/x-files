@@ -24,11 +24,12 @@
 
 ---
 
-WebSocket-based file browser for Node.js. Browse, read, write, and manage remote files through a simple, secure API.
+WebSocket-based file browser for Node.js with full upload/download capabilities. Browse, read, write, upload, download, and manage remote files through a simple, secure API. Supports both text and binary files with automatic file type detection.
 
 ## Why x-files.js?
 
 - **WebSocket-based** - Real-time, bidirectional communication
+- **Binary file support** - Upload and download text and binary files seamlessly
 - **Security-first** - Path whitelisting, auth hooks, granular permissions
 - **Lightweight** - ~10KB client bundle, minimal dependencies
 - **TypeScript** - Full type definitions included
@@ -76,6 +77,19 @@ const { content } = await client.readFile('/home/user/projects/README.md');
 
 // Write a file
 await client.writeFile('/home/user/projects/hello.txt', 'Hello, World!');
+
+// Upload binary file
+const imageBuffer = await fs.readFile('./image.jpg');
+await client.uploadBinary('/home/user/projects/image.jpg', imageBuffer);
+
+// Download file (auto-detects text vs binary)
+const { content, isBinary } = await client.downloadFile('/home/user/projects/image.jpg');
+if (isBinary) {
+  const buffer = Buffer.from(content, 'base64');
+  // Handle binary data
+} else {
+  console.log(content); // Handle text data
+}
 ```
 
 ### Client (Node.js)
@@ -280,6 +294,10 @@ const handler = new XFilesHandler({
 | `copy(source, destination)` | Copy file/directory | `allowWrite` |
 | `exists(path)` | Check if path exists | - |
 | `search(path, pattern, options?)` | Search for files | - |
+| `uploadFile(path, content, encoding?, isBinary?)` | Upload text or binary file | `allowWrite` |
+| `uploadBinary(path, buffer)` | Upload binary file from Buffer | `allowWrite` |
+| `downloadFile(path, asBinary?)` | Download file (auto-detects binary) | - |
+| `downloadBinary(path)` | Download file as Buffer | - |
 
 ### FileEntry Type
 
@@ -347,6 +365,38 @@ const handler = new XFilesHandler({
 ```
 
 ## Examples
+
+### File Upload/Download
+
+```typescript
+import { XFilesClient } from 'x-files.js/client';
+import { promises as fs } from 'fs';
+
+const client = new XFilesClient({ url: 'ws://localhost:8080' });
+await client.connect();
+
+// Upload text file
+await client.uploadFile('/remote/path/document.txt', 'Hello, World!');
+
+// Upload binary file from Buffer
+const imageData = await fs.readFile('./local-image.jpg');
+await client.uploadBinary('/remote/path/image.jpg', imageData);
+
+// Download and auto-detect file type
+const { content, isBinary, size } = await client.downloadFile('/remote/path/image.jpg');
+if (isBinary) {
+  // Save binary file
+  const buffer = Buffer.from(content, 'base64');
+  await fs.writeFile('./downloaded-image.jpg', buffer);
+} else {
+  // Handle text file
+  console.log('Text content:', content);
+}
+
+// Download binary file directly as Buffer
+const { buffer } = await client.downloadBinary('/remote/path/image.jpg');
+await fs.writeFile('./downloaded-binary.jpg', buffer);
+```
 
 ### With Express
 
