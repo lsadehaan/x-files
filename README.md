@@ -24,7 +24,7 @@
 
 ---
 
-WebSocket-based file browser for Node.js. Browse, read, write, upload, download, and manage remote files through a simple, secure API.
+WebSocket-based file browser for Node.js with full upload/download capabilities. Browse, read, write, upload, download, and manage remote files through a simple, secure API. Supports both text and binary files with automatic file type detection.
 
 ## Why x-files.js?
 
