@@ -274,6 +274,15 @@ export class XFilesHandler {
           result = await this.searchFiles(params.path, params.pattern, params.options);
           break;
 
+        case 'upload':
+          this.checkWritePermission();
+          result = await this.uploadFile(params.path, params.content, params.encoding, params.isBinary);
+          break;
+
+        case 'download':
+          result = await this.downloadFile(params.path, params.asBinary);
+          break;
+
         default:
           throw new Error(`Unknown operation: ${type}`);
       }
@@ -496,6 +505,90 @@ export class XFilesHandler {
 
     await this.searchDirectoryRecursive(resolvedPath, regex, results, recursive, maxResults);
     return results;
+  }
+
+  /**
+   * Upload file with support for binary data
+   */
+  async uploadFile(
+    filePath: string,
+    content: string,
+    encoding: BufferEncoding = 'utf-8',
+    isBinary: boolean = false
+  ): Promise<{ path: string; size: number }> {
+    const resolvedPath = this.validatePath(filePath);
+
+    // Handle binary data (base64 encoded)
+    let buffer: Buffer;
+    if (isBinary) {
+      buffer = Buffer.from(content, 'base64');
+    } else {
+      buffer = Buffer.from(content, encoding);
+    }
+
+    // Check file size limit
+    if (buffer.length > this.config.maxFileSize) {
+      throw new Error(`File too large: ${buffer.length} bytes (max: ${this.config.maxFileSize})`);
+    }
+
+    await fs.writeFile(resolvedPath, buffer);
+    const stats = await fs.stat(resolvedPath);
+
+    return { path: resolvedPath, size: stats.size };
+  }
+
+  /**
+   * Download file with support for binary data
+   */
+  async downloadFile(filePath: string, asBinary: boolean = false): Promise<{ content: string; size: number; isBinary: boolean }> {
+    const resolvedPath = this.validatePath(filePath);
+    const stats = await fs.stat(resolvedPath);
+
+    if (stats.size > this.config.maxFileSize) {
+      throw new Error(`File too large: ${stats.size} bytes (max: ${this.config.maxFileSize})`);
+    }
+
+    // Read file as buffer
+    const buffer = await fs.readFile(resolvedPath);
+
+    // Return content as base64 if binary requested or if file appears to be binary
+    if (asBinary || this.isBinaryFile(buffer)) {
+      return {
+        content: buffer.toString('base64'),
+        size: stats.size,
+        isBinary: true
+      };
+    } else {
+      return {
+        content: buffer.toString('utf-8'),
+        size: stats.size,
+        isBinary: false
+      };
+    }
+  }
+
+  /**
+   * Check if buffer contains binary data
+   */
+  private isBinaryFile(buffer: Buffer): boolean {
+    // Simple check: if file contains null bytes or high percentage of non-printable chars
+    const chunk = buffer.subarray(0, Math.min(8192, buffer.length));
+    let nonPrintable = 0;
+
+    for (let i = 0; i < chunk.length; i++) {
+      const byte = chunk[i];
+      // Null byte indicates binary
+      if (byte === 0) {
+        return true;
+      }
+      // Count non-printable ASCII characters (excluding common whitespace)
+      if (byte < 32 && byte !== 9 && byte !== 10 && byte !== 13) {
+        nonPrintable++;
+      }
+    }
+
+    // If more than 10% non-printable, consider binary
+    return (nonPrintable / chunk.length) > 0.1;
   }
 
   private async searchDirectoryRecursive(
