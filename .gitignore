@@ -25,5 +25,5 @@ coverage/
 *.tmp
 *.temp
 
-# Cloud IDE
+# Cloud Code
 .cloud-code/

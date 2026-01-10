@@ -1,6 +1,6 @@
 {
   "name": "x-files.js",
-  "version": "0.3.1",
+  "version": "0.4.7",
   "description": "WebSocket-based file browser for Node.js - the truth is in your file system",
   "type": "module",
   "main": "dist/server/index.js",
@@ -42,7 +42,11 @@
     "watch": "tsc --watch",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
-    "test": "echo \"Tests coming soon\" && exit 0"
+    "test": "echo \"Tests coming soon\" && exit 0",
+    "version": "node scripts/version.js",
+    "version:bump": "node scripts/version.js bump",
+    "release": "node scripts/release.js",
+    "release:create": "node scripts/release.js create"
   },
   "keywords": [
     "file-browser",
