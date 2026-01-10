@@ -404,6 +404,54 @@ document.getElementById('file-list').innerHTML = files
 </script>
 ```
 
+## Development
+
+### Building the Project
+
+```bash
+npm run build          # Compile TypeScript + browser bundle
+npm run build:browser  # Just browser bundle
+npm run watch          # Watch mode for TypeScript
+npm run clean          # Remove dist/
+```
+
+### Version Management
+
+```bash
+npm run version                    # Show current version and usage
+npm run version get               # Get current version
+npm run version:bump patch        # Bump patch version (0.3.1 → 0.3.2)
+npm run version:bump minor        # Bump minor version (0.3.1 → 0.4.0)
+npm run version:bump major        # Bump major version (0.3.1 → 1.0.0)
+```
+
+### Releasing
+
+The project uses automated CI/CD through GitHub Actions:
+
+```bash
+npm run release:create            # Create and push release tag
+```
+
+This will:
+1. ✅ Check that working directory is clean
+2. 🏗️ Build the project
+3. 🧪 Run tests
+4. 🏷️ Create and push git tag (`v{version}`)
+5. 🚀 Trigger GitHub Actions to publish to NPM and create GitHub release
+
+**Release Workflow:**
+1. Make your changes and commit them
+2. Bump version: `npm run version:bump patch` (or minor/major)
+3. Commit version bump: `git commit -am "Bump version to v0.3.2"`
+4. Create release: `npm run release:create`
+
+The GitHub Actions workflow will automatically:
+- Run tests on multiple Node.js versions
+- Build the project
+- Publish to NPM with provenance
+- Create a GitHub release with auto-generated release notes
+
 ## Use Cases
 
 - **Web IDEs** - Browse and edit remote code

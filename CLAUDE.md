@@ -13,6 +13,14 @@ npm run build          # Compile TypeScript + browser bundle
 npm run build:browser  # Just browser bundle
 npm run watch          # Watch mode for TypeScript
 npm run clean          # Remove dist/
+
+# Version management
+npm run version:bump patch   # Bump patch version
+npm run version:bump minor   # Bump minor version
+npm run version:bump major   # Bump major version
+
+# Release workflow
+npm run release:create       # Create release tag and trigger CICD
 ```
 
 ## Architecture
