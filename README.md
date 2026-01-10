@@ -125,6 +125,7 @@ x-files.js includes ready-to-use Web Components built with [Lit](https://lit.dev
 | Component | Description |
 |-----------|-------------|
 | `<x-files-browser>` | Full file browser with navigation, toolbar, and context menu |
+| `<x-files-tabbed-browser>` | Tabbed file browser with multiple independent tabs |
 | `<x-files-icon>` | File/folder icon with type detection |
 | `<x-files-breadcrumb>` | Breadcrumb path navigation |
 
@@ -157,6 +158,44 @@ x-files.js includes ready-to-use Web Components built with [Lit](https://lit.dev
   });
 </script>
 ```
+
+### Tabbed Browser Component
+
+The tabbed browser allows users to open multiple directories in tabs for efficient multitasking:
+
+```html
+<x-files-tabbed-browser
+  url="ws://localhost:8080"
+  path="/home/user"
+  max-tabs="8"
+  show-hidden
+></x-files-tabbed-browser>
+
+<script>
+  const browser = document.querySelector('x-files-tabbed-browser');
+
+  // Listen for events (include tabId to identify which tab)
+  browser.addEventListener('navigate', (e) => {
+    console.log(`Tab ${e.detail.tabId} navigated to: ${e.detail.path}`);
+  });
+
+  browser.addEventListener('select', (e) => {
+    console.log(`File selected in tab ${e.detail.tabId}:`, e.detail.file);
+  });
+
+  browser.addEventListener('open', (e) => {
+    console.log(`File opened in tab ${e.detail.tabId}:`, e.detail.file);
+  });
+</script>
+```
+
+**Key Features:**
+- Multiple independent tabs with shared connection
+- Double-click directories to open in new tabs
+- Tab switching and closing with intuitive UI
+- Configurable maximum tabs (default: 10)
+- All events include `tabId` for tab identification
+- Responsive design with mobile support
 
 ### Theming
 
@@ -211,12 +250,27 @@ function App() {
     console.log('Selected:', e.detail.file);
   };
 
+  const handleTabbedNavigate = (e) => {
+    console.log(`Tab ${e.detail.tabId} navigated to:`, e.detail.path);
+  };
+
   return (
-    <x-files-browser
-      url="ws://localhost:8080"
-      path="/home/user"
-      onSelect={handleSelect}
-    />
+    <div>
+      {/* Single browser */}
+      <x-files-browser
+        url="ws://localhost:8080"
+        path="/home/user"
+        onSelect={handleSelect}
+      />
+
+      {/* Tabbed browser */}
+      <x-files-tabbed-browser
+        url="ws://localhost:8080"
+        path="/home/user"
+        max-tabs="8"
+        onNavigate={handleTabbedNavigate}
+      />
+    </div>
   );
 }
 ```
@@ -225,11 +279,22 @@ function App() {
 
 ```vue
 <template>
-  <x-files-browser
-    url="ws://localhost:8080"
-    path="/home/user"
-    @select="onSelect"
-  />
+  <div>
+    <!-- Single browser -->
+    <x-files-browser
+      url="ws://localhost:8080"
+      path="/home/user"
+      @select="onSelect"
+    />
+
+    <!-- Tabbed browser -->
+    <x-files-tabbed-browser
+      url="ws://localhost:8080"
+      path="/home/user"
+      max-tabs="8"
+      @navigate="onTabbedNavigate"
+    />
+  </div>
 </template>
 
 <script setup>
@@ -237,6 +302,10 @@ import 'x-files.js/ui/browser';
 
 const onSelect = (e) => {
   console.log('Selected:', e.detail.file);
+};
+
+const onTabbedNavigate = (e) => {
+  console.log(`Tab ${e.detail.tabId} navigated to:`, e.detail.path);
 };
 </script>
 ```
