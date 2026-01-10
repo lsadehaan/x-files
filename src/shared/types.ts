@@ -51,7 +51,9 @@ export type MessageType =
   | 'rename'
   | 'copy'
   | 'exists'
-  | 'search';
+  | 'search'
+  | 'upload'
+  | 'download';
 
 /**
  * Client request message
