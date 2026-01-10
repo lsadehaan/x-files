@@ -54,7 +54,7 @@ const handler = new XFilesHandler({
 });
 
 const wss = new WebSocketServer({
-  port: 3000,
+  port: 3001,
   perMessageDeflate: false
 });
 
@@ -67,7 +67,7 @@ wss.on('error', (error) => {
   console.error('❌ WebSocket server error:', error);
 });
 
-console.log('🌐 WebSocket server running on ws://localhost:3000');
+console.log('🌐 WebSocket server running on ws://localhost:3001');
 console.log('📖 Open test-tabbed-browser.html in your browser to test');
 console.log('🛑 Press Ctrl+C to stop');
 
