@@ -142,12 +142,12 @@ x-files.js includes ready-to-use Web Components built with [Lit](https://lit.dev
 <script>
   const browser = document.querySelector('x-files-browser');
 
-  // Listen for file selection
+  // Listen for file selection (triggered on every click)
   browser.addEventListener('select', (e) => {
     console.log('Selected:', e.detail.file);
   });
 
-  // Listen for file open (double-click)
+  // Listen for file open (double-click or context menu)
   browser.addEventListener('open', (e) => {
     console.log('Opened:', e.detail.file);
   });
@@ -174,7 +174,7 @@ The tabbed browser allows users to open multiple directories in tabs for efficie
 <script>
   const browser = document.querySelector('x-files-tabbed-browser');
 
-  // Listen for events (include tabId to identify which tab)
+  // Listen for events (optional - include tabId to identify which tab)
   browser.addEventListener('navigate', (e) => {
     console.log(`Tab ${e.detail.tabId} navigated to: ${e.detail.path}`);
   });
@@ -196,6 +196,18 @@ The tabbed browser allows users to open multiple directories in tabs for efficie
 - Configurable maximum tabs (default: 10)
 - All events include `tabId` for tab identification
 - Responsive design with mobile support
+
+### Event Handling
+
+Both browser components support the same events. **All event listeners are optional** - you only need to listen to the events you care about.
+
+| Event | When Triggered | Detail Properties |
+|-------|----------------|-------------------|
+| `select` | On every file/folder click (selection) | `file: FileEntry`, `tabId?: string` |
+| `open` | On double-click or context menu "Open" | `file: FileEntry`, `tabId?: string` |
+| `navigate` | When changing directories | `path: string`, `tabId?: string` |
+
+**Note**: The `tabId` property is only included in events from `<x-files-tabbed-browser>` to identify which tab triggered the event.
 
 ### Theming
 
@@ -250,6 +262,10 @@ function App() {
     console.log('Selected:', e.detail.file);
   };
 
+  const handleTabbedSelect = (e) => {
+    console.log(`Tab ${e.detail.tabId} selected:`, e.detail.file);
+  };
+
   const handleTabbedNavigate = (e) => {
     console.log(`Tab ${e.detail.tabId} navigated to:`, e.detail.path);
   };
@@ -263,11 +279,12 @@ function App() {
         onSelect={handleSelect}
       />
 
-      {/* Tabbed browser */}
+      {/* Tabbed browser (supports all the same events + tabId) */}
       <x-files-tabbed-browser
         url="ws://localhost:8080"
         path="/home/user"
         max-tabs="8"
+        onSelect={handleTabbedSelect}
         onNavigate={handleTabbedNavigate}
       />
     </div>
@@ -287,11 +304,13 @@ function App() {
       @select="onSelect"
     />
 
-    <!-- Tabbed browser -->
+    <!-- Tabbed browser (supports all the same events + tabId) -->
     <x-files-tabbed-browser
       url="ws://localhost:8080"
       path="/home/user"
       max-tabs="8"
+      @select="onTabbedSelect"
+      @open="onTabbedOpen"
       @navigate="onTabbedNavigate"
     />
   </div>
@@ -302,6 +321,14 @@ import 'x-files.js/ui/browser';
 
 const onSelect = (e) => {
   console.log('Selected:', e.detail.file);
+};
+
+const onTabbedSelect = (e) => {
+  console.log(`Tab ${e.detail.tabId} selected:`, e.detail.file);
+};
+
+const onTabbedOpen = (e) => {
+  console.log(`Tab ${e.detail.tabId} opened:`, e.detail.file);
 };
 
 const onTabbedNavigate = (e) => {
