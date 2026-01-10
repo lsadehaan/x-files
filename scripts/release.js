@@ -58,11 +58,8 @@ function createRelease() {
     process.exit(1);
   }
 
-  // Build the project
-  execCommand('npm run build', 'Building project');
-
-  // Run tests
-  execCommand('npm test', 'Running tests');
+  console.log(`📋 Creating and pushing release tag...`);
+  console.log(`   ℹ️  Build and tests will be handled by GitHub Actions`);
 
   // Create and push tag
   execCommand(`git tag -a ${tagName} -m "Release ${tagName}"`, `Creating tag ${tagName}`);
@@ -90,6 +87,8 @@ if (!command || command === '--help' || command === '-h') {
   console.log('  - Clean working directory (no uncommitted changes)');
   console.log('  - Proper NPM_TOKEN secret configured in GitHub');
   console.log('  - Version already bumped in package.json');
+  console.log('');
+  console.log('Note: Build and tests are handled automatically by GitHub Actions');
   process.exit(0);
 }
 

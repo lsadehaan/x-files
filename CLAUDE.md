@@ -21,6 +21,7 @@ npm run version:bump major   # Bump major version
 
 # Release workflow
 npm run release:create       # Create release tag and trigger CICD
+                             # (build/test handled automatically by GitHub Actions)
 ```
 
 ## Architecture
