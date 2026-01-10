@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Files Tabbed Browser Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #cccccc;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #3c3c3c;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+        }
+
+        .description {
+            color: #808080;
+            margin: 0;
+        }
+
+        .browser-container {
+            height: 600px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #1e1e1e;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .controls button {
+            background: transparent;
+            border: 1px solid #3c3c3c;
+            color: #cccccc;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .controls button:hover {
+            background: #2d2d2d;
+            border-color: #0078d4;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #2d2d2d;
+            border-radius: 4px;
+            border-left: 4px solid #0078d4;
+        }
+
+        .status h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+
+        .log {
+            background: #1e1e1e;
+            color: #cccccc;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 150px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🗂️ X-Files Tabbed Browser</h1>
+            <p class="description">
+                Testing the new tabbed file browsing component. This component allows opening multiple
+                file browsing sessions in tabs within the same interface.
+            </p>
+        </div>
+
+        <div class="controls">
+            <button onclick="connect()">🔌 Connect to Server</button>
+            <button onclick="toggleTheme()">🎨 Toggle Theme</button>
+            <button onclick="toggleHidden()">👁️ Toggle Hidden Files</button>
+            <button onclick="clearLog()">🗑️ Clear Log</button>
+        </div>
+
+        <div class="browser-container">
+            <x-files-tabbed-browser
+                id="browser"
+                url="ws://localhost:3000"
+                theme="dark"
+                max-tabs="8">
+            </x-files-tabbed-browser>
+        </div>
+
+        <div class="status">
+            <h3>📊 Event Log</h3>
+            <div id="log" class="log">Ready to test tabbed browsing...\n</div>
+        </div>
+    </div>
+
+    <!-- Load the UI bundle -->
+    <script type="module" src="dist/ui/browser-bundle.js"></script>
+
+    <script>
+        const browser = document.getElementById('browser');
+        const log = document.getElementById('log');
+        let currentTheme = 'dark';
+        let showHidden = false;
+
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            log.textContent += `[${timestamp}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function connect() {
+            addLog('Attempting to connect to WebSocket server...');
+            // The browser will attempt to connect automatically when url is set
+            // In a real scenario, you'd have a WebSocket server running
+        }
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            browser.theme = currentTheme;
+            document.body.style.background = currentTheme === 'dark' ? '#1e1e1e' : '#ffffff';
+            document.body.style.color = currentTheme === 'dark' ? '#cccccc' : '#1f2937';
+            addLog(`Theme changed to ${currentTheme}`);
+        }
+
+        function toggleHidden() {
+            showHidden = !showHidden;
+            browser.showHidden = showHidden;
+            addLog(`Hidden files ${showHidden ? 'shown' : 'hidden'}`);
+        }
+
+        function clearLog() {
+            log.textContent = 'Log cleared...\n';
+        }
+
+        // Event listeners for browser events
+        browser.addEventListener('navigate', (e) => {
+            const { path, tabId } = e.detail;
+            addLog(`Navigation in tab ${tabId}: ${path}`);
+        });
+
+        browser.addEventListener('select', (e) => {
+            const { file, tabId } = e.detail;
+            addLog(`Selected in tab ${tabId}: ${file.name}`);
+        });
+
+        browser.addEventListener('open', (e) => {
+            const { file, tabId } = e.detail;
+            addLog(`Opened in tab ${tabId}: ${file.name} (${file.isDirectory ? 'directory' : 'file'})`);
+        });
+
+        // Initialize
+        addLog('Tabbed browser component loaded');
+        addLog('Note: To test with real files, start a WebSocket server on localhost:3000');
+        addLog('Example: node examples/upload-download-example.js');
+    </script>
+</body>
+</html>

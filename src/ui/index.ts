@@ -6,6 +6,7 @@
  */
 
 export { XFilesBrowser } from './x-files-browser.js';
+export { XFilesTabbedBrowser } from './x-files-tabbed-browser.js';
 export { XFilesIcon } from './x-files-icon.js';
 export { XFilesBreadcrumb } from './x-files-breadcrumb.js';
 
