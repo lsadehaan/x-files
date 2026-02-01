@@ -170,6 +170,30 @@ export class XFilesBrowser extends LitElement {
       .file-item.hidden-file {
         opacity: 0.6;
       }
+
+      /* Mobile touch improvements */
+      .file-item {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        touch-action: manipulation;
+      }
+
+      /* Larger touch targets on mobile */
+      @media (max-width: 768px) {
+        .file-item {
+          min-height: 48px;
+          padding: 8px var(--xf-padding);
+        }
+
+        .file-size, .file-date {
+          display: none;
+        }
+
+        .toolbar button {
+          padding: 10px 12px;
+        }
+      }
     `,
   ];
 
@@ -190,8 +214,17 @@ export class XFilesBrowser extends LitElement {
   @state() private rootPath = '/';
   @state() private serverConfig: ServerConfig | null = null;
 
+  // Mobile support
+  @state() private isMobile = false;
+  private longPressTimer: ReturnType<typeof setTimeout> | null = null;
+  private longPressTriggered = false;
+
   override connectedCallback() {
     super.connectedCallback();
+
+    // Detect mobile devices
+    this.detectMobile();
+
     if (this.url) {
       this.connect();
     }
@@ -199,6 +232,21 @@ export class XFilesBrowser extends LitElement {
     // Close context menu on outside click
     document.addEventListener('click', this.handleDocumentClick);
     document.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  private detectMobile(): void {
+    const hasTouch = navigator.maxTouchPoints > 0;
+    const isMobileWidth = window.matchMedia('(max-width: 768px)').matches;
+    const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+    this.isMobile = hasTouch && (isMobileWidth || mobileUA);
+
+    window.matchMedia('(max-width: 768px)').addEventListener('change', (e) => {
+      if (navigator.maxTouchPoints > 0) {
+        this.isMobile = e.matches;
+      }
+    });
   }
 
   override disconnectedCallback() {
@@ -311,6 +359,12 @@ export class XFilesBrowser extends LitElement {
   }
 
   private handleFileClick(file: FileEntry) {
+    // On mobile, if long press was triggered, don't handle click
+    if (this.longPressTriggered) {
+      this.longPressTriggered = false;
+      return;
+    }
+
     this.selectedFile = file;
     this.dispatchEvent(
       new CustomEvent('select', {
@@ -319,9 +373,17 @@ export class XFilesBrowser extends LitElement {
         composed: true,
       })
     );
+
+    // On mobile, single tap opens folders
+    if (this.isMobile && file.isDirectory) {
+      this.navigateTo(file.path);
+    }
   }
 
   private handleFileDoubleClick(file: FileEntry) {
+    // On mobile, double-click is handled by single click
+    if (this.isMobile) return;
+
     if (file.isDirectory) {
       this.navigateTo(file.path);
     } else {
@@ -343,6 +405,35 @@ export class XFilesBrowser extends LitElement {
 
     this.selectedFile = file;
     this.contextMenu = { x: e.clientX, y: e.clientY, file };
+  }
+
+  // Mobile long-press handlers
+  private handleTouchStart(e: TouchEvent, file: FileEntry) {
+    if (!this.isMobile) return;
+
+    this.longPressTriggered = false;
+    const touch = e.touches[0];
+
+    this.longPressTimer = setTimeout(() => {
+      this.longPressTriggered = true;
+      this.selectedFile = file;
+      this.contextMenu = { x: touch.clientX, y: touch.clientY, file };
+    }, 500); // 500ms for long press
+  }
+
+  private handleTouchEnd() {
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
+    }
+  }
+
+  private handleTouchMove() {
+    // Cancel long press if user moves finger
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
+    }
   }
 
   private async handleRefresh() {
@@ -477,6 +568,9 @@ export class XFilesBrowser extends LitElement {
                   @click=${() => this.handleFileClick(file)}
                   @dblclick=${() => this.handleFileDoubleClick(file)}
                   @contextmenu=${(e: MouseEvent) => this.handleContextMenu(e, file)}
+                  @touchstart=${(e: TouchEvent) => this.handleTouchStart(e, file)}
+                  @touchend=${this.handleTouchEnd}
+                  @touchmove=${this.handleTouchMove}
                 >
                   <x-files-icon
                     .name=${file.name}
